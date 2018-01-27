@@ -5,8 +5,10 @@
  </style>
  
  <body>
- <div id="questionnire">
-   <div id="questionone">
+ <div id="maincontent">
+ <div id="loading" style="visibility: visible">
+ </div>
+ <div id="questionnire" style="visbility: hidden">
      <p>Q: Which group is this idol from?</p>
 	 <input type="checkbox" id="input1">a</input></br>
 	 <input type="checkbox" id="input2">b</input></br>
@@ -15,29 +17,48 @@
    </div>
  </div>
  <script>
- var theList;
+ var theList = {};
+ var theNameList;
  var theLength;
- var theWidth;
+ var theAnswer;
  function loadText(link, callback) {
   var response, xmlhttp;
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
-    if (xhttp.readyState === 4 && xhttp.status === 200 && callback) callback(xhttp.responseText);
+    if (xhttp.readyState === 4 && xhttp.status === 200 && callback) callback(xhttp.responseText, link);
   };
   xhttp.open("GET", "https://raw.githubusercontent.com/kuroyukiasuna/apppage.github.io/master/database/"+link+".txt", true);
   xhttp.send();
 };
 
-function callback(text){
+function callback(text, input){ 
 var result = text.split('\n');
-return result;
+theNameList = result;
+theLength = theNameList.length
+for(var i = 0; i < theLength; i++){
+  loadText(theNameList[i],addToTheList)
+}
 }
 
-function createlist(){
+function addToTheList(text, input){
+var result = text.split('\n');
+console.log(result);
+theList[input] = result;
+}
+
+function showloading(){
 
 }
 
 loadText("groupname", callback);
+setTimeout(function(){ 
+
+console.log(theNameList); 
+console.log(theList);
+}, 1000);
+
+
+
 
 
  </script>
