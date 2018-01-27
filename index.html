@@ -5,7 +5,31 @@
  </style>
  
  <body>
+ <div id="questionnire">
+   <div id="questionone">
+     <p>Q: Which group is this idol from?</p>
+	 <input type="checkbox" id="input1">a</input></br>
+	 <input type="checkbox" id="input2">b</input></br>
+	 <input type="checkbox" id="input3">c</input></br>
+	 <input type="checkbox" id="input4">d</input></br>
+   </div>
+ </div>
  <script>
+ var abc;
+ function loadText(link) {
+  var result;
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      result = this.responseText;
+	  console.log(this.responseText);
+    }
+  };
+  xhttp.open("GET", "https://raw.githubusercontent.com/sftsfa/sftsfa.github.io/master/text/"+link+".txt", true);
+  xhttp.send();
+  return result;
+};
+console.log(loadText('Jraky'));
  </script>
  </body>
  </html>
