@@ -6,21 +6,32 @@
  
  <body>
  <div id="maincontent">
- <div id="loading" style="visibility: visible">
- </div>
- <div id="questionnire" style="visbility: hidden">
+ <div id="loading" style="visibility: visible">Now Loading ...
+ </div></br>
+ <button id="refresh" onclick="refresh()" style="visibility: hidden">restart</button>
+ <div id="questionnire" style="visibility: hidden; top: 0px; position: fixed;">
      <p>Q: Which group is this idol from?</p>
-	 <input type="checkbox" id="input1">a</input></br>
-	 <input type="checkbox" id="input2">b</input></br>
-	 <input type="checkbox" id="input3">c</input></br>
-	 <input type="checkbox" id="input4">d</input></br>
+	 <p id="count" style="float: right;"></p>
+	 <!---<div id="theQuestion"></div></br>
+	 <input type="checkbox" id="in1" style="float: left;"><div id="input1"></div></input></br>
+	 <input type="checkbox" id="in2" style="float: left;"><div id="input2"></div></input></br>
+	 <input type="checkbox" id="in3" style="float: left;"><div id="input3"></div></input></br>
+	 <input type="checkbox" id="in4" style="float: left;"><div id="input4"></div></input></br>--->
    </div>
+   <div style="top: 325px; position: fixed;">
+   <p id="message" style="visibility: hidden;">correct!</p>
+   <button id="next" style="visibility: hidden;" onclick="selectQuestion()">next</button>
+ <div>
  </div>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
  <script>
  var theList = {};
  var theNameList;
+ var theAmount = 0;
+ var beenTested = [];
  var theLength;
- var theAnswer;
+ var theAnswer = 0;
+ var scoreCount = 0;
  function loadText(link, callback) {
   var response, xmlhttp;
   var xhttp = new XMLHttpRequest();
@@ -42,25 +53,148 @@ for(var i = 0; i < theLength; i++){
 
 function addToTheList(text, input){
 var result = text.split('\n');
-console.log(result);
+theAmount += result.length;
 theList[input] = result;
 }
 
-function showloading(){
+function hideloading(){
+  document.getElementById("loading").style.visibility = "hidden";
+  document.getElementById("questionnire").style.visibility = "visible";
+}
 
+Array.prototype.contains = function(obj) {
+    var i = this.length;
+    while (i--) {
+        if (this[i] === obj) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function getRnd(tested, top){
+  var rnd = Math.floor((Math.random() * top));
+   while(tested.contains(rnd)){
+     rnd = Math.floor((Math.random() * top));
+   }
+  return rnd;
+}
+
+function selectQuestion(){
+   var question =  getRnd(beenTested, theAmount);
+   beenTested.push(question);
+   question = question + 1;
+   //console.log(question);
+   theAnswer = 0;
+   while(question > theList[theNameList[theAnswer]].length){
+    question -= theList[theNameList[theAnswer]].length;
+	theAnswer = theAnswer + 1;
+   }
+    document.getElementById("count").innerHTML = beenTested.length + "/" + theAmount;
+	//console.log(beenTested);
+	
+	   	if(beenTested.length === theAmount){
+	  document.getElementById("next").innerHTML = "Finish";
+	  document.getElementById("next").onclick = function() {Finish()};
+	}
+   
+   if(beenTested.length === 1){
+   
+   $("#questionnire").append("<div id='theQuestion'><strong>"+theList[theNameList[theAnswer]][question - 1]+"</strong></div></br>");
+   
+   for(var l = 0; l < theLength; l++){
+     $("#questionnire").append("<input type='checkbox' class='choices' onclick='answer(this.id)' id='"
+	                            + theNameList[l]+
+								"'style='float: left;'><div id='"
+	                            + theNameList[l] + "text"+
+								"' style='background: transparent; width: 250px;'>"
+								+ theNameList[l]+
+								"</div></input></br>");
+   }
+   }else{
+   document.getElementById("message").style.visibility = "hidden";
+   document.getElementById("next").style.visibility = "hidden";
+   document.getElementById("theQuestion").innerHTML = theList[theNameList[theAnswer]][question - 1];
+    var cho = document.getElementsByClassName("choices");
+    for(var l = 0; l < cho.length; l++){
+     cho[l].disabled = false;
+	 cho[l].checked = false;
+	 document.getElementById(cho[l].id+"text").style.background = "transparent";
+    }
+   }
+   
+
+   /*var tested = [];
+   tested.push(theAnswer);
+   rnd1 = getRnd(tested, theNameList.length);
+   tested.push(rnd1);
+   rnd2 = getRnd(tested, theNameList.length);
+   tested.push(rnd2);
+   rnd3 = getRnd(tested, theNameList.length);
+   tested.push(rnd3);
+   
+   q = document.getElementById("theQuestion");
+   q.innerHTML = theList[theNameList[theAnswer]][question - 1];
+   
+   var temp;
+   var pool = [];
+   temp = getRnd(pool, 4);
+   pool.push(temp);
+   var a1 = document.getElementById("input1");
+   a1.innerHTML = theNameList[tested[temp]];
+   temp = getRnd(pool, 4);
+   pool.push(temp);
+   document.getElementById("input2").innerHTML = theNameList[tested[temp]];
+   temp = getRnd(pool, 4);
+   pool.push(temp);
+   document.getElementById("input3").innerHTML = theNameList[tested[temp]];
+   temp = getRnd(pool, 4);
+   pool.push(temp);
+   document.getElementById("input4").innerHTML = theNameList[tested[temp]];
+
+   //console.log(document.getElementById("input4"));
+   //console.log(theList[theNameList[theAnswer]][question - 1]);
+   console.log(rnd1+ " " + rnd2 + " " + rnd3 + " " + theAnswer);*/
+}
+
+function answer(ans){
+ var cho = document.getElementsByClassName("choices");
+  for(var l = 0; l < cho.length; l++){
+     cho[l].disabled = true;
+   }
+   document.getElementById(theNameList[theAnswer]+"text").style.background = "lightgreen";
+   document.getElementById("next").style.visibility = "visible";
+   if(ans === theNameList[theAnswer]){
+   document.getElementById("message").innerHTML = "Correct!";
+   scoreCount = scoreCount + 1;
+   }else{
+     document.getElementById(ans+"text").style.background = "red";
+	 document.getElementById("message").innerHTML = "Incorrect";
+   }
+   document.getElementById("message").style.visibility = "visible";
+}
+
+function Finish(){
+document.getElementById("questionnire").style.visibility = "hidden";
+   document.getElementById("message").style.visibility = "hidden";
+   document.getElementById("next").style.visibility = "hidden";
+ document.getElementById("loading").innerHTML = "Test Completed, your answered "
+												+scoreCount+ " correctly out of "
+												+theAmount+" questions.";
+document.getElementById("loading").style.visibility = "visible";
+document.getElementById("refresh").style.visibility = "visible";
+}
+
+function refresh(){
+ location.reload();
 }
 
 loadText("groupname", callback);
-setTimeout(function(){ 
-
-console.log(theNameList); 
-console.log(theList);
-}, 1000);
-
-
-
-
-
+setTimeout(function(){
+selectQuestion();
+hideloading();
+//console.log(theList); 
+}, 1500);
  </script>
  </body>
  </html>
