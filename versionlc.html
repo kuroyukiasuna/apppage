@@ -9,16 +9,11 @@
  <div id="loading" style="visibility: visible">Now Loading ...
  </div></br>
  <button id="refresh" onclick="refresh()" style="visibility: hidden">restart</button>
- <div id="questionnire" style="visibility: hidden; top: 0px; position: fixed;">
-     <p>Q: Which group is this idol from?</p>
-	 <p id="count" style="float: right;"></p>
-	 <!---<div id="theQuestion"></div></br>
-	 <input type="checkbox" id="in1" style="float: left;"><div id="input1"></div></input></br>
-	 <input type="checkbox" id="in2" style="float: left;"><div id="input2"></div></input></br>
-	 <input type="checkbox" id="in3" style="float: left;"><div id="input3"></div></input></br>
-	 <input type="checkbox" id="in4" style="float: left;"><div id="input4"></div></input></br>--->
+ <div id="questionnire" style="visibility: hidden; top: 0px; position: absolute; float: left;">
+     <p>Q: Which maker is this brand from?</p>
+	 <p id="count" style="top: 40px; left: 300px; position: fixed;"></p>
    </div>
-   <div style="top: 325px; position: fixed;">
+   <div style="top: 60px; left: 300px; position: fixed;">
    <p id="message" style="visibility: hidden;">correct!</p>
    <button id="next" style="visibility: hidden;" onclick="selectQuestion()">next</button>
  <div>
@@ -27,6 +22,7 @@
  <script>
  var theList = {};
  var theNameList;
+ 
  var theAmount = 0;
  var beenTested = [];
  var theLength;
@@ -38,7 +34,30 @@
   xhttp.onreadystatechange = function() {
     if (xhttp.readyState === 4 && xhttp.status === 200 && callback) callback(xhttp.responseText, link);
   };
-  xhttp.open("GET", "https://raw.githubusercontent.com/kuroyukiasuna/apppage.github.io/master/database/"+link+".txt", true);
+  
+  
+
+  xhttp.open("GET", "https://raw.githubusercontent.com/dancewithphenix/database/master/"+ 
+   
+   /************************************
+  
+  change things here, don't touch anything else
+  在这里改地址
+  ここでアドレスを変えてください
+  
+  **********************************************/
+  
+  "VehicleBrand"
+     
+   /************************************
+	------------------------------------------------
+    ------------------------------------------------
+  **********************************************/
+  
+  + "/"+link+".txt", true);
+
+  
+  
   xhttp.send();
 };
 
@@ -53,8 +72,12 @@ for(var i = 0; i < theLength; i++){
 
 function addToTheList(text, input){
 var result = text.split('\n');
-theAmount += result.length;
+if(result[0] === ""){
+theList[input] = [];
+}else{
 theList[input] = result;
+theAmount += result.length;
+}
 }
 
 function hideloading(){
@@ -84,14 +107,12 @@ function selectQuestion(){
    var question =  getRnd(beenTested, theAmount);
    beenTested.push(question);
    question = question + 1;
-   //console.log(question);
    theAnswer = 0;
    while(question > theList[theNameList[theAnswer]].length){
     question -= theList[theNameList[theAnswer]].length;
 	theAnswer = theAnswer + 1;
    }
     document.getElementById("count").innerHTML = beenTested.length + "/" + theAmount;
-	//console.log(beenTested);
 	
 	   	if(beenTested.length === theAmount){
 	  document.getElementById("next").innerHTML = "Finish";
@@ -122,39 +143,6 @@ function selectQuestion(){
 	 document.getElementById(cho[l].id+"text").style.background = "transparent";
     }
    }
-   
-
-   /*var tested = [];
-   tested.push(theAnswer);
-   rnd1 = getRnd(tested, theNameList.length);
-   tested.push(rnd1);
-   rnd2 = getRnd(tested, theNameList.length);
-   tested.push(rnd2);
-   rnd3 = getRnd(tested, theNameList.length);
-   tested.push(rnd3);
-   
-   q = document.getElementById("theQuestion");
-   q.innerHTML = theList[theNameList[theAnswer]][question - 1];
-   
-   var temp;
-   var pool = [];
-   temp = getRnd(pool, 4);
-   pool.push(temp);
-   var a1 = document.getElementById("input1");
-   a1.innerHTML = theNameList[tested[temp]];
-   temp = getRnd(pool, 4);
-   pool.push(temp);
-   document.getElementById("input2").innerHTML = theNameList[tested[temp]];
-   temp = getRnd(pool, 4);
-   pool.push(temp);
-   document.getElementById("input3").innerHTML = theNameList[tested[temp]];
-   temp = getRnd(pool, 4);
-   pool.push(temp);
-   document.getElementById("input4").innerHTML = theNameList[tested[temp]];
-
-   //console.log(document.getElementById("input4"));
-   //console.log(theList[theNameList[theAnswer]][question - 1]);
-   console.log(rnd1+ " " + rnd2 + " " + rnd3 + " " + theAnswer);*/
 }
 
 function answer(ans){
@@ -162,6 +150,7 @@ function answer(ans){
   for(var l = 0; l < cho.length; l++){
      cho[l].disabled = true;
    }
+   console.log(document.getElementById("Roselistext"));
    document.getElementById(theNameList[theAnswer]+"text").style.background = "lightgreen";
    document.getElementById("next").style.visibility = "visible";
    if(ans === theNameList[theAnswer]){
@@ -175,6 +164,8 @@ function answer(ans){
 }
 
 function Finish(){
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
 document.getElementById("questionnire").style.visibility = "hidden";
    document.getElementById("message").style.visibility = "hidden";
    document.getElementById("next").style.visibility = "hidden";
@@ -193,7 +184,6 @@ function setTimeoutForLoading(a1){
      setTimeout(function(){
 	 if(theLength != a1){
 	   setTimeoutForLoading(theLength);
-	   console.log(1); 
 	 }else{
      selectQuestion();
      hideloading();
@@ -203,6 +193,7 @@ function setTimeoutForLoading(a1){
 
 loadText("groupname", callback);
 setTimeoutForLoading(0);
+console.log(theList);
  </script>
  </body>
  </html>
